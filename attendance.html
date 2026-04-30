@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI;
+}
+
+body{
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;
+  height:100vh;
+  background:#111827;
+  padding:20px;
+}
+
+.menu a{
+  display:block;
+  padding:12px;
+  color:#cbd5e1;
+  text-decoration:none;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+
+.menu a:hover,
+.menu a.active{
+  background:#1e293b;
+  color:#38bdf8;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  margin-bottom:20px;
+  color:#38bdf8;
+}
+
+/* FORM */
+.form{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+.form input{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+}
+
+.form button{
+  padding:10px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* LIST */
+.list{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-bottom:1px solid #334155;
+}
+
+.status{
+  padding:5px 10px;
+  border-radius:6px;
+  font-size:12px;
+}
+
+.present{
+  background:#22c55e;
+}
+
+.absent{
+  background:#ef4444;
+}
+
+.actions button{
+  margin-left:5px;
+  padding:5px 8px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.actions .p{
+  background:#22c55e;
+}
+
+.actions .a{
+  background:#ef4444;
+}
+
+/* SUMMARY */
+.summary{
+  margin-top:15px;
+  font-size:16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="menu">
+    <a href="index.html">Dashboard</a>
+    <a href="website.html">Website</a>
+    <a href="employees.html">Employees</a>
+    <a href="sales.html">Sales</a>
+    <a href="customers.html">Customers</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="attendance.html" class="active">Attendance</a>
+    <a href="settings.html">Settings</a>
+    <a href="#" onclick="logout()">Sign Out</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h2>Attendance Management</h2>
+  </div>
+
+  <!-- ADD EMPLOYEE -->
+  <div class="form">
+    <input type="text" id="empName" placeholder="Employee Name">
+    <button onclick="addEmployee()">Add</button>
+  </div>
+
+  <!-- LIST -->
+  <div class="list" id="attendanceList"></div>
+
+  <!-- SUMMARY -->
+  <div class="summary" id="summary"></div>
+
+</div>
+
+<script>
+
+// DATA
+let employees = [
+  {name:"sudheer", status:"present"},
+  {name:"er", status:"absent"}
+];
+
+// ADD
+function addEmployee(){
+  let name = document.getElementById("empName").value;
+
+  if(name){
+    employees.push({name, status:"present"});
+    document.getElementById("empName").value="";
+    render();
+  } else {
+    alert("Enter name");
+  }
+}
+
+// MARK PRESENT
+function markPresent(i){
+  employees[i].status = "present";
+  render();
+}
+
+// MARK ABSENT
+function markAbsent(i){
+  employees[i].status = "absent";
+  render();
+}
+
+// DELETE
+function deleteEmp(i){
+  employees.splice(i,1);
+  render();
+}
+
+// RENDER
+function render(){
+  let html="";
+  let present=0, absent=0;
+
+  employees.forEach((e,i)=>{
+    if(e.status==="present") present++;
+    else absent++;
+
+    html+=`
+      <div class="row">
+        <div>${e.name}</div>
+
+        <div class="status ${e.status}">
+          ${e.status}
+        </div>
+
+        <div class="actions">
+          <button class="p" onclick="markPresent(${i})">P</button>
+          <button class="a" onclick="markAbsent(${i})">A</button>
+          <button onclick="deleteEmp(${i})">X</button>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("attendanceList").innerHTML = html;
+  document.getElementById("summary").innerText =
+    `Present: ${present} | Absent: ${absent}`;
+}
+
+// LOGOUT
+function logout(){
+  alert("Logged out!");
+  window.location.href="login.html";
+}
+
+// INIT
+render();
+
+</script>
+
+</body>
+</html>

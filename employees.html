@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Employee Dashboard JS</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+background:#0c0d17;
+color:#fff;
+padding:20px;
+}
+
+/* SIDEBAR FIX */
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:220px;
+  height:100vh;
+  background:#111827;
+  padding:20px;
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:30px;
+  font-size:24px;
+}
+
+.menu a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  color:#cbd5e1;
+  text-decoration:none;
+  border-radius:8px;
+  margin-bottom:8px;
+  transition:0.3s;
+}
+
+.menu a:hover,
+.menu a.active{
+  background:#1e293b;
+  color:#38bdf8;
+}
+
+/* MOVE MAIN CONTENT RIGHT */
+body{
+  margin-left:240px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.title{
+font-size:30px;
+color:#f0a31b;
+font-weight:bold;
+}
+
+.plus{
+width:42px;
+height:42px;
+border:none;
+border-radius:50%;
+background:#a96f09;
+color:#fff;
+font-size:26px;
+cursor:pointer;
+}
+
+.search{
+width:100%;
+padding:14px;
+border:1px solid #666;
+border-radius:10px;
+background:#111;
+color:#fff;
+margin-bottom:18px;
+outline:none;
+}
+
+.filters{
+display:flex;
+gap:10px;
+justify-content:center;
+margin-bottom:20px;
+}
+
+.filters button{
+padding:10px 16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+}
+
+.active{
+background:#f0a31b;
+color:#fff;
+}
+
+.normal{
+background:#fff;
+color:#000;
+}
+
+.card{
+background:#242334;
+padding:16px;
+border-radius:10px;
+margin-bottom:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.name{
+font-size:20px;
+font-weight:600;
+}
+
+.role{
+font-size:15px;
+color:#ccc;
+margin-top:4px;
+}
+
+.actions button{
+margin-left:8px;
+padding:8px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.delete{
+background:#e53935;
+color:#fff;
+}
+
+.info{
+background:#555;
+color:#fff;
+}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.7);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+.box{
+background:#1e1d2d;
+padding:25px;
+border-radius:12px;
+width:320px;
+}
+
+.box input,.box select{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:8px;
+background:#111;
+color:#fff;
+}
+
+.save{
+width:100%;
+padding:12px;
+background:#f0a31b;
+border:none;
+border-radius:8px;
+color:#fff;
+cursor:pointer;
+font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+      <div class="sidebar">
+  <div class="logo">🏠</div>
+
+  <div class="menu">
+    <a href="index.html">Dashboard</a>
+    <a href="website.html">Website</a>
+    <a href="employees.html" class="active">Employees</a>
+    <a href="sales.html">Sales</a>
+    <a href="customers.html">Customers</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="settings.html">Settings</a>
+    <a href="#" onclick="logout()">Sign Out</a>
+  </div>
+</div>
+
+<div class="header">
+<div class="title">Employee Details</div>
+<button class="plus" onclick="openModal()">+</button>
+</div>
+
+<input type="text" class="search" placeholder="Search Employees..." onkeyup="searchEmployee(this.value)">
+
+<div class="filters">
+<button class="active" onclick="filterRole('All')">All Employees</button>
+<button class="normal" onclick="filterRole('Inside Sales')">Inside Sales</button>
+<button class="normal" onclick="filterRole('Outside Sales')">Outside Sales</button>
+</div>
+
+<div id="employeeList"></div>
+
+<!-- ADD MODAL -->
+<div class="modal" id="modal">
+<div class="box">
+<input type="text" id="empName" placeholder="Employee Name">
+<select id="empRole">
+<option>Inside Sales</option>
+<option>Outside Sales</option>
+</select>
+<button class="save" onclick="addEmployee()">Save Employee</button>
+</div>
+</div>
+
+<script>
+let employees = JSON.parse(localStorage.getItem("employees")) || [
+{name:"sudheer",role:"Inside Sales"},
+{name:"er",role:"Inside Sales"},
+{name:"rayudu",role:"Inside Sales"},
+{name:"usha",role:"Outside Sales"},
+{name:"manch",role:"Outside Sales"}
+];
+
+let currentFilter = "All";
+
+function saveData(){
+localStorage.setItem("employees",JSON.stringify(employees));
+}
+
+function render(data = employees){
+let html = "";
+
+data.forEach((emp,index)=>{
+html += `
+<div class="card">
+<div>
+<div class="name">Name: ${emp.name}</div>
+<div class="role">Role : ${emp.role}</div>
+</div>
+
+<div class="actions">
+<button class="info" onclick="showInfo('${emp.name}','${emp.role}')">i</button>
+<button class="delete" onclick="deleteEmployee(${index})">🗑</button>
+</div>
+</div>
+`;
+});
+
+document.getElementById("employeeList").innerHTML = html;
+}
+
+function openModal(){
+document.getElementById("modal").style.display="flex";
+}
+
+window.onclick=function(e){
+if(e.target.id=="modal"){
+document.getElementById("modal").style.display="none";
+}
+}
+
+function addEmployee(){
+let name = document.getElementById("empName").value;
+let role = document.getElementById("empRole").value;
+
+if(name=="") return;
+
+employees.push({name:name,role:role});
+saveData();
+render();
+document.getElementById("empName").value="";
+document.getElementById("modal").style.display="none";
+}
+
+function deleteEmployee(i){
+employees.splice(i,1);
+saveData();
+render();
+}
+
+function showInfo(name,role){
+alert("Employee Name: "+name+"\nRole: "+role);
+}
+
+function searchEmployee(text){
+text = text.toLowerCase();
+
+let result = employees.filter(emp =>
+emp.name.toLowerCase().includes(text) &&
+(currentFilter=="All" || emp.role==currentFilter)
+);
+
+render(result);
+}
+
+function filterRole(role){
+currentFilter = role;
+
+let result = employees.filter(emp =>
+role=="All" || emp.role==role
+);
+
+render(result);
+}
+
+render();
+</script>
+
+</body>
+</html>

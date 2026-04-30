@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI;
+}
+
+body{
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;
+  height:100vh;
+  background:#111827;
+  padding:20px;
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:30px;
+  font-size:24px;
+}
+
+.menu a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  color:#cbd5e1;
+  text-decoration:none;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+
+.menu a:hover,
+.menu a.active{
+  background:#1e293b;
+  color:#38bdf8;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+.header{
+  margin-bottom:20px;
+  color:#38bdf8;
+}
+
+/* FORM */
+.form{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+.form input{
+  padding:10px;
+  margin-right:10px;
+  border:none;
+  border-radius:6px;
+}
+
+.form button{
+  padding:10px 15px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* SEARCH */
+.search{
+  margin-bottom:15px;
+}
+
+.search input{
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:none;
+}
+
+/* LIST */
+.list{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  border-bottom:1px solid #334155;
+}
+
+.row:last-child{
+  border:none;
+}
+
+.info small{
+  color:#94a3b8;
+}
+
+.actions i{
+  cursor:pointer;
+  margin-left:10px;
+  color:#f87171;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">🏠</div>
+
+  <div class="menu">
+    <a href="index.html">Dashboard</a>
+    <a href="website.html">Website</a>
+    <a href="employees.html">Employees</a>
+    <a href="sales.html">Sales</a>
+    <a href="customers.html" class="active">Customers</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="settings.html">Settings</a>
+    <a href="#" onclick="logout()">Sign Out</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h2>Customer Management</h2>
+  </div>
+
+  <!-- ADD CUSTOMER -->
+  <div class="form">
+    <input type="text" id="name" placeholder="Customer Name">
+    <input type="text" id="phone" placeholder="Phone">
+    <button onclick="addCustomer()">Add</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search">
+    <input type="text" id="search" placeholder="Search customer..." onkeyup="searchCustomer()">
+  </div>
+
+  <!-- LIST -->
+  <div class="list" id="customerList"></div>
+
+</div>
+
+<script>
+
+// DATA
+let customers = [];
+
+// ADD
+function addCustomer(){
+  let name = document.getElementById("name").value;
+  let phone = document.getElementById("phone").value;
+
+  if(name && phone){
+    customers.push({name, phone});
+    document.getElementById("name").value="";
+    document.getElementById("phone").value="";
+    renderCustomers(customers);
+  } else {
+    alert("Enter all fields");
+  }
+}
+
+// DELETE
+function deleteCustomer(index){
+  customers.splice(index,1);
+  renderCustomers(customers);
+}
+
+// RENDER
+function renderCustomers(data){
+  let html="";
+
+  data.forEach((c,i)=>{
+    html+=`
+      <div class="row">
+        <div class="info">
+          <div>${c.name}</div>
+          <small>${c.phone}</small>
+        </div>
+
+        <div class="actions">
+          <i class="ri-delete-bin-line" onclick="deleteCustomer(${i})"></i>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("customerList").innerHTML = html;
+}
+
+// SEARCH
+function searchCustomer(){
+  let text = document.getElementById("search").value.toLowerCase();
+
+  let filtered = customers.filter(c =>
+    c.name.toLowerCase().includes(text) ||
+    c.phone.includes(text)
+  );
+
+  renderCustomers(filtered);
+}
+
+// LOGOUT
+function logout(){
+  alert("Logged out!");
+  window.location.href="login.html";
+}
+
+</script>
+
+</body>
+</html>

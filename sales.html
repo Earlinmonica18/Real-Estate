@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sales</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI;
+}
+
+body{
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;
+  height:100vh;
+  background:#111827;
+  padding:20px;
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:30px;
+  font-size:24px;
+}
+
+.menu a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  color:#cbd5e1;
+  text-decoration:none;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+
+.menu a:hover,
+.menu a.active{
+  background:#1e293b;
+  color:#38bdf8;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  margin-bottom:20px;
+  color:#38bdf8;
+}
+
+/* FORM */
+.form{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+.form input{
+  padding:10px;
+  margin-right:10px;
+  border:none;
+  border-radius:6px;
+}
+
+.form button{
+  padding:10px 15px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* TABLE */
+.table{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #334155;
+}
+
+.row:last-child{
+  border:none;
+}
+
+.actions i{
+  cursor:pointer;
+  margin-left:10px;
+  color:#f87171;
+}
+
+/* TOTAL */
+.total{
+  margin-top:15px;
+  font-size:18px;
+  color:#22c55e;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">🏠</div>
+
+  <div class="menu">
+    <a href="index.html">Dashboard</a>
+    <a href="website.html">Website</a>
+    <a href="employees.html">Employees</a>
+    <a href="sales.html" class="active">Sales</a>
+    <a href="customers.html">Customers</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="settings.html">Settings</a>
+    <a href="#" onclick="logout()">Sign Out</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h2>Sales Management</h2>
+  </div>
+
+  <!-- ADD SALE -->
+  <div class="form">
+    <input type="text" id="product" placeholder="Product Name">
+    <input type="number" id="amount" placeholder="Amount">
+    <button onclick="addSale()">Add Sale</button>
+  </div>
+
+  <!-- SALES LIST -->
+  <div class="table" id="salesList"></div>
+
+  <div class="total" id="totalAmount"></div>
+
+</div>
+
+<script>
+
+// DATA
+let sales = [];
+
+// ADD SALE
+function addSale(){
+  let product = document.getElementById("product").value;
+  let amount = parseFloat(document.getElementById("amount").value);
+
+  if(product && amount){
+    sales.push({product, amount});
+    document.getElementById("product").value="";
+    document.getElementById("amount").value="";
+    renderSales();
+  } else {
+    alert("Enter valid data");
+  }
+}
+
+// DELETE SALE
+function deleteSale(index){
+  sales.splice(index,1);
+  renderSales();
+}
+
+// RENDER
+function renderSales(){
+  let html="";
+  let total=0;
+
+  sales.forEach((s,i)=>{
+    total += s.amount;
+
+    html+=`
+      <div class="row">
+        <div>${s.product}</div>
+        <div>₹ ${s.amount}</div>
+        <div class="actions">
+          <i class="ri-delete-bin-line" onclick="deleteSale(${i})"></i>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("salesList").innerHTML = html;
+  document.getElementById("totalAmount").innerText = "Total Sales: ₹ " + total;
+}
+
+// LOGOUT
+function logout(){
+  alert("Logged out!");
+  window.location.href="login.html";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Calendar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI;
+}
+
+body{
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;
+  height:100vh;
+  background:#111827;
+  padding:20px;
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.menu a{
+  display:block;
+  padding:12px;
+  color:#cbd5e1;
+  text-decoration:none;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+
+.menu a:hover,
+.menu a.active{
+  background:#1e293b;
+  color:#38bdf8;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.header button{
+  padding:8px 12px;
+  border:none;
+  background:#38bdf8;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* CALENDAR */
+.calendar{
+  background:#1e293b;
+  padding:20px;
+  border-radius:12px;
+}
+
+.days,
+.dates{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:10px;
+  text-align:center;
+}
+
+.day{
+  color:#94a3b8;
+}
+
+.date{
+  padding:12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.date:hover{
+  background:#334155;
+}
+
+.today{
+  background:#22c55e;
+}
+
+.selected{
+  background:#6366f1;
+}
+
+/* EVENT BOX */
+.event-box{
+  margin-top:20px;
+}
+
+.event-box input{
+  padding:10px;
+  width:70%;
+  border:none;
+  border-radius:6px;
+}
+
+.event-box button{
+  padding:10px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.events{
+  margin-top:10px;
+  font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">🏠</div>
+
+  <div class="menu">
+    <a href="index.html">Dashboard</a>
+    <a href="website.html">Website</a>
+    <a href="employees.html">Employees</a>
+    <a href="sales.html">Sales</a>
+    <a href="customers.html">Customers</a>
+    <a href="calendar.html" class="active">Calendar</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="settings.html">Settings</a>
+    <a href="#" onclick="logout()">Sign Out</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <button onclick="prevMonth()">◀</button>
+    <h2 id="monthYear"></h2>
+    <button onclick="nextMonth()">▶</button>
+  </div>
+
+  <div class="calendar">
+    <div class="days">
+      <div class="day">Sun</div>
+      <div class="day">Mon</div>
+      <div class="day">Tue</div>
+      <div class="day">Wed</div>
+      <div class="day">Thu</div>
+      <div class="day">Fri</div>
+      <div class="day">Sat</div>
+    </div>
+
+    <div class="dates" id="dates"></div>
+
+    <!-- EVENT -->
+    <div class="event-box">
+      <input type="text" id="eventInput" placeholder="Add event...">
+      <button onclick="addEvent()">Add</button>
+
+      <div class="events" id="eventList"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+let currentDate = new Date();
+let selectedDate = null;
+let events = {};
+
+function renderCalendar(){
+  let year = currentDate.getFullYear();
+  let month = currentDate.getMonth();
+
+  let firstDay = new Date(year, month, 1).getDay();
+  let lastDate = new Date(year, month + 1, 0).getDate();
+
+  document.getElementById("monthYear").innerText =
+    currentDate.toLocaleString("default", {month:"long"}) + " " + year;
+
+  let datesHTML = "";
+
+  for(let i=0;i<firstDay;i++){
+    datesHTML += `<div></div>`;
+  }
+
+  for(let i=1;i<=lastDate;i++){
+    let today = new Date();
+
+    let isToday =
+      i === today.getDate() &&
+      month === today.getMonth() &&
+      year === today.getFullYear();
+
+    let key = `${year}-${month}-${i}`;
+
+    datesHTML += `
+      <div class="date ${isToday?'today':''}" onclick="selectDate(${i})">
+        ${i}
+      </div>
+    `;
+  }
+
+  document.getElementById("dates").innerHTML = datesHTML;
+}
+
+function selectDate(day){
+  selectedDate = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
+  showEvents();
+}
+
+function addEvent(){
+  let text = document.getElementById("eventInput").value;
+
+  if(!selectedDate){
+    alert("Select a date first");
+    return;
+  }
+
+  if(!events[selectedDate]) events[selectedDate] = [];
+  events[selectedDate].push(text);
+
+  document.getElementById("eventInput").value="";
+  showEvents();
+}
+
+function showEvents(){
+  let list = events[selectedDate] || [];
+
+  let html = "<b>Events:</b><br>";
+  list.forEach(e => html += "• " + e + "<br>");
+
+  document.getElementById("eventList").innerHTML = html;
+}
+
+function prevMonth(){
+  currentDate.setMonth(currentDate.getMonth()-1);
+  renderCalendar();
+}
+
+function nextMonth(){
+  currentDate.setMonth(currentDate.getMonth()+1);
+  renderCalendar();
+}
+
+function logout(){
+  alert("Logged out!");
+  window.location.href="login.html";
+}
+
+renderCalendar();
+
+</script>
+
+</body>
+</html>
